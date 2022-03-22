@@ -1,0 +1,13 @@
+name = "EquationsSolver"
+uuid = "5d795e5a-a85f-4cbe-a274-66ed2c49fe0f"
+authors = ["yjy <522432938@qq.com> and contributors"]
+version = "0.1.0"
+
+[compat]
+julia = "1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
