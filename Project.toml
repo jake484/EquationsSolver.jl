@@ -1,12 +1,16 @@
+authors = ["yjy <522432938@qq.com> and contributors"]
 name = "EquationsSolver"
 uuid = "5d795e5a-a85f-4cbe-a274-66ed2c49fe0f"
-authors = ["yjy <522432938@qq.com> and contributors"]
 version = "0.1.0"
 
 [compat]
 julia = "1"
 
+[deps]
+Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
+
 [extras]
+CPUSummary = "2a0fbf3d-bb9c-48f3-b0a9-814d99fd7ab9"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
