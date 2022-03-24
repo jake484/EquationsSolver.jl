@@ -10,22 +10,26 @@ struct LinearProblem <: EquationsProblem
     vars::Vector{Num}
     maxiters::Int
 end
+
 struct NonlinearProblem <: EquationsProblem
-    eqs::Vector{Equation}
+    eqs::Vector{Num}
     vars::Vector{Num}
     maxiters::Int
 end
-solve_liner = Symbolics.solve_for
-function EquationsProblem(eqs::Any, vars, maxiters=10000)
+
+function LinearProblem(eqs::Any, vars::Dict, maxiters=10000)
+    checked_eqs = check_eqs(eqs)
+    res = check_vars(checked_eqs, vars)
+    return LinearProblem(eqs, collect(keys(vars)), maxiters)
+end
+function NonlinearProblem(eqs::Any, vars::Dict, maxiters=10000)
     eqs = check_eqs(eqs)
     res = check_vars(eqs, vars)
-    if islinear(eqs, vars)
-        return LinearProblem(eqs, vars, maxiters)
-    else
-        return NonlinearProblem(eqs, vars, maxiters)
-    end
+    return LinearProblem(eqs, vars, maxiters)
 end
 
-export EquationsProblem
-
+export LinearProblem
+export NonlinearProblem
+export solve
+include("solver.jl")
 end
