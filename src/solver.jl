@@ -1,5 +1,6 @@
 solve_liner = Symbolics.solve_for
 
+
 function solve(problem::LinearProblem)
     eqs = problem.eqs
     vars = problem.vars
@@ -7,9 +8,11 @@ function solve(problem::LinearProblem)
     return Dict([(vars[i], sol[i]) for i in 1:length(vars)])
 end
 
+
 function one_cal(array, dict, f, ja)
     return array .- inv(Symbolics.value.(substitute.(ja, (dict,)))) * Symbolics.value.(substitute.(f, (dict,)))
 end
+
 
 function get_dict(array, dict, vars)
     for i in 1:length(vars)
@@ -17,6 +20,7 @@ function get_dict(array, dict, vars)
     end
     return dict
 end
+
 
 function _solve(dict, f, ja, maxiter, abstol, vars)
     last_v = Inf
@@ -42,10 +46,10 @@ end
 
 function solve(problem::NonlinearProblem)
     eqs = problem.eqs
-    vars = problem.vars
+    dict_u = problem.vars
+    vars = collect(keys(problem.vars))
     maxiters = problem.maxiters
     abstol = problem.abstol
-    dict_u = vars
     jac = Symbolics.jacobian(eqs, vars)
     sol = _solve(dict_u, eqs, jac, maxiters, abstol,vars)
     return sol

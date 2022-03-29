@@ -1,6 +1,7 @@
 module EquationsSolver
 
 using Symbolics
+import Symbolics:@variables,Equation
 
 include("base.jl")
 
@@ -13,7 +14,7 @@ end
 
 struct NonlinearProblem <: EquationsProblem
     eqs::Vector{Num}
-    vars::Vector{Num}
+    vars::Dict
     maxiters::Int
     abstol::Float64
 end
@@ -23,15 +24,15 @@ function LinearProblem(eqs::Any, vars::Dict, maxiters=10000)
     res = check_vars(checked_eqs, vars)
     return LinearProblem(eqs, collect(keys(vars)), maxiters)
 end
-function NonlinearProblem(eqs::Any, vars::Dict, maxiters=10000,abstol = 1.0E-6)
+function NLProblem(eqs::Any, vars::Dict; maxiters=10000,abstol = 1.0E-6)
     eqs = check_eqs(eqs)
     res = check_vars(eqs, vars)
     return NonlinearProblem(eqs, vars, maxiters,abstol)
 end
 
 export LinearProblem
-export NonlinearProblem
+export NLProblem
 export solve
-
+export @variables,Equation
 include("solver.jl")
 end

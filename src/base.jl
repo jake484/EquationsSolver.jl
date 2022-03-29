@@ -20,7 +20,7 @@ function check_eqs(eqs)
     elseif typeof(eqs) == Vector{Equation}
         return toexpr(eqs)
     else
-        error("Error: type of eqs must be Equation or Vector{Equation}")
+        error("Error: type of eqs should not be $(typeof(eqs)).It must be Equation or Vector{Equation}")
     end
 end
 
