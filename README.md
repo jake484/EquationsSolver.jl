@@ -9,7 +9,7 @@
 
 EquationsSolver is a little user-friendly tool to solve linear equations and nonlinear equations.
 
-It is based on Symbolics.jl
+It is based on [Symbolics.jl](https://github.com/JuliaSymbolics/Symbolics.jl)
 
 It can test your little problems very fast and easily.
 
