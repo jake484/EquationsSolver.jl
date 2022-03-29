@@ -119,6 +119,7 @@ end
     vars = Dict(x => 2.0)
     pro = NLProblem(eqs,vars)
     res = solve(pro)
+    println(res)
     @test length(res) == 1
 end
 
@@ -133,6 +134,7 @@ end
     vars = Dict(x => 1.0, y => 0.0, z => 0.0)
     pro = LinearProblem(eqs,vars)
     res = solve(pro)
+    @show res
     @test round.(collect(values(res)), digits=1) == [1.0,1.0,1.0]
 end
 
@@ -146,6 +148,7 @@ end
     vars = Dict(x => 2.0, y => 1.0)
     pro = NLProblem(eqs, vars)
     res = solve(pro)
+    @show res
     @test round(res[x], digits=2) == 1.04 &&
           round(res[y], digits=2) == 0.47
 end

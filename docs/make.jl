@@ -11,10 +11,14 @@ makedocs(;
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
         canonical="https://jake484.github.io/EquationsSolver.jl",
-        assets=String[],
+        assets=["assets/logo.png"],
     ),
     pages=[
         "Home" => "index.md",
+        "Tutorials" => Any[
+            "tutorials/LinearProblem.md",
+            "tutorials/NLProblem.md",
+        ]
     ],
 )
 
