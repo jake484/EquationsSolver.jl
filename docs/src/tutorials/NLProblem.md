@@ -6,12 +6,7 @@ There some NonlinearProblem example.
 
 solve function:
 
-$$
-\left\{\begin{matrix} x^2 + y^2 + z^2 = 1.0\\ 
-2  x^2 + y^2 - 4  z = 0 \\ 
- 3  x^2 - 4  y^2 + z^2 = 0
-\end{matrix}\right.
-$$
+$$\left\{\begin{matrix} x^2 + y^2 + z^2 = 1.0\\2  x^2 + y^2 - 4 z = 0 \\ 3  x^2 - 4  y^2 + z^2 = 0\end{matrix}\right.$$
 
 julia code:
 
@@ -36,12 +31,7 @@ res = Dict{Num, Float64}(
 
 solve function:
 
-$$
-\left\{\begin{matrix}
-    cos(x^2 + 0.4  y) + x^2 + y^2 = 1.6\\
-    1.5  x^2 - 1 / 0.36 * y^2 = 1.0
-\end{matrix}\right.
-$$
+$$\left\{\begin{matrix}cos(x^2 + 0.4  y) + x^2 + y^2 = 1.6\\1.5 x^2 - 1 / 0.36 * y^2 = 1.0\end{matrix}\right.$$
 
 julia code:
 
@@ -63,12 +53,7 @@ res = Dict{Num, Float64}(
 
 solve function:
 
-$$
-\left\{\begin{matrix}
-    4  x + 0.1 * e^x = y + 1\\
-    4 y + x^2 / 8 = x
-\end{matrix}\right.
-$$
+$$\left\{\begin{matrix}4  x + 0.1 * e^x = y + 1\\4 y + x^2 / 8 = x\end{matrix}\right.$$
 
 julia code:
 

@@ -6,12 +6,7 @@ There some LinearProblem example.
 
 solve function:
 
-$$
-\left\{\begin{matrix} x+y+z = 3\\ 
-x + 4y + 9z = 14 \\ 
-x + 2y + 3z = 6
-\end{matrix}\right.    
-$$
+$$\left\{\begin{matrix} x+y+z = 3\\ x + 4y + 9z = 14 \\ x + 2y + 3z = 6\end{matrix}\right.$$
 
 julia code:
 

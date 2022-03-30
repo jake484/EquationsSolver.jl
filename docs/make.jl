@@ -6,12 +6,12 @@ DocMeta.setdocmeta!(EquationsSolver, :DocTestSetup, :(using EquationsSolver); re
 makedocs(;
     modules=[EquationsSolver],
     authors="yjy <522432938@qq.com> and contributors",
-    repo="https://github.com/jake484/EquationsSolver.jl/blob/{commit}{path}#{line}",
+    #repo="https://github.com/jake484/EquationsSolver.jl/blob/{commit}{path}#{line}",
     sitename="EquationsSolver.jl",
     format=Documenter.HTML(;
-        prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://jake484.github.io/EquationsSolver.jl",
-        assets=["assets/logo.png"],
+        # prettyurls=get(ENV, "CI", "false") == "true",
+        # canonical="https://jake484.github.io/EquationsSolver.jl",
+        # assets=["assets/logo.png"],
     ),
     pages=[
         "Home" => "index.md",
