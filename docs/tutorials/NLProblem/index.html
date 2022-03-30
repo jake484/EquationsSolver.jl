@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Solve NonlinearProblem · EquationsSolver.jl</title><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.039/juliamono-regular.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.11/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../../"><img src="../../assets/logo.png" alt="EquationsSolver.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit"><a href="../../">EquationsSolver.jl</a></span></div><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><span class="tocitem">Tutorials</span><ul><li><a class="tocitem" href="../LinearProblem/">Solve LinearProblem</a></li><li class="is-active"><a class="tocitem" href>Solve NonlinearProblem</a><ul class="internal"><li><a class="tocitem" href="#NLP-examples"><span>NLP examples</span></a></li></ul></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Tutorials</a></li><li class="is-active"><a href>Solve NonlinearProblem</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Solve NonlinearProblem</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/jake484/EquationsSolver.jl/blob/master/docs/src/tutorials/NLProblem.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Solve-NonlinearProblem"><a class="docs-heading-anchor" href="#Solve-NonlinearProblem">Solve NonlinearProblem</a><a id="Solve-NonlinearProblem-1"></a><a class="docs-heading-anchor-permalink" href="#Solve-NonlinearProblem" title="Permalink"></a></h1><p>There some NonlinearProblem example.</p><h2 id="NLP-examples"><a class="docs-heading-anchor" href="#NLP-examples">NLP examples</a><a id="NLP-examples-1"></a><a class="docs-heading-anchor-permalink" href="#NLP-examples" title="Permalink"></a></h2><p>solve function:</p><p class="math-container">\[\left\{\begin{matrix} x^2 + y^2 + z^2 = 1.0\\2  x^2 + y^2 - 4 z = 0 \\ 3  x^2 - 4  y^2 + z^2 = 0\end{matrix}\right.\]</p><p>julia code:</p><pre><code class="language-julia hljs">@variables x, y, z
+eqs = [
+    x^2 + y^2 + z^2 ~ 1.0
+    2 * x^2 + y^2 - 4 * z ~ 0
+    3 * x^2 - 4 * y^2 + z^2 ~ 0
+]
+vars = Dict(x =&gt; 2.0, y =&gt; 1.0, z =&gt; 1.0)
+pro = NLProblem(eqs, vars)
+res = solve(pro)
+@show res
+
+res = Dict{Num, Float64}(
+    y =&gt; 0.6285242979602138, 
+    z =&gt; 0.3425641896895694, 
+    x =&gt; 0.6982886099715139
+    )</code></pre><p>solve function:</p><p class="math-container">\[\left\{\begin{matrix}cos(x^2 + 0.4  y) + x^2 + y^2 = 1.6\\1.5 x^2 - 1 / 0.36 * y^2 = 1.0\end{matrix}\right.\]</p><p>julia code:</p><pre><code class="language-julia hljs">@variables x, y
+eqs = [
+    cos(x^2 + 0.4 * y) + x^2 + y^2 ~ 1.6
+    1.5 * x^2 - 1 / 0.36 * y^2 ~ 1.0
+]
+vars = Dict(x =&gt; 2.0, y =&gt; 1.0)
+pro = NLProblem(eqs, vars)
+res = solve(pro)
+
+res = Dict{Num, Float64}(
+    y =&gt; 0.47172595266055173, 
+    x =&gt; 1.0386292376770578
+    )</code></pre><p>solve function:</p><p class="math-container">\[\left\{\begin{matrix}4  x + 0.1 * e^x = y + 1\\4 y + x^2 / 8 = x\end{matrix}\right.\]</p><p>julia code:</p><pre><code class="language-julia hljs">@variables x, y
+eqs = [
+    4 * x + 0.1 * exp(x) ~ y + 1
+    4 * y + x^2 / 8 ~ x
+]
+vars = Dict(x =&gt; 2.0, y =&gt; 1.0)
+pro = NLProblem(eqs, vars)
+res = solve(pro)
+
+res = Dict{Num, Float64}(
+    y =&gt; 0.056451519652141575, 
+    x =&gt; 0.23256700509067185
+    ) </code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../LinearProblem/">« Solve LinearProblem</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.15 on <span class="colophon-date" title="Wednesday 30 March 2022 09:32">Wednesday 30 March 2022</span>. Using Julia version 1.6.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
