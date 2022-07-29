@@ -25,3 +25,4 @@ pro = NLProblem(eqs,vars)
 res = solve(pro)
 ```
 
+See [docs](https://jake484.github.io/EquationsSolver.jl/) for more information.
