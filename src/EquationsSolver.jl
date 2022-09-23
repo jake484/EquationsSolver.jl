@@ -29,7 +29,6 @@ function NLProblem(eqs::Any, vars::Dict; maxiters=10000, abstol=1.0E-6)
     eqs = check_eqs(eqs)
     res = check_vars(eqs, vars)
     vars = promote_vars(vars)
-    println(vars)
     return NonlinearProblem(eqs, vars, maxiters, abstol)
 end
 

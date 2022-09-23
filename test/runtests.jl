@@ -1,10 +1,10 @@
 using EquationsSolver
 using Test
-
+using Symbolics
 @testset "promote_vars" begin
     @variables x, y
-    vars = Dict(x=>1,y=>1)
-    @test EquationsSolver.promote_vars(vars) == Dict(x=>1.0,y=>1.0)
+    vars = Dict(x => 1, y => 1)
+    @test EquationsSolver.promote_vars(vars) == Dict(x => 1.0, y => 1.0)
 end
 
 @testset "NLProblem Int" begin
@@ -16,7 +16,6 @@ end
     ]
     vars = Dict(x => 2, y => 1.0, z => 1)
     pro = NLProblem(eqs, vars)
-    println(pro.vars)
     res = solve(pro)
     @test round(res[x], digits=2) == 0.70 &&
           round(res[y], digits=2) == 0.63 &&
@@ -129,7 +128,7 @@ end
     vars = Dict(x => 1.0, y => 0.0, z => 0.0)
     jac = Symbolics.jacobian(eqs, [x, y, z])
     res = EquationsSolver._solve(vars, eqs, jac, 10000, 1.0E-6, [x, y, z])
-    @test round.(collect(values(res)), digits=1) == [1.0,1.0,1.0]
+    @test round.(collect(values(res)), digits=1) == [1.0, 1.0, 1.0]
 end
 
 
@@ -139,25 +138,23 @@ end
         x + 5 ~ exp(x)
     ]
     vars = Dict(x => 2.0)
-    pro = NLProblem(eqs,vars)
+    pro = NLProblem(eqs, vars)
     res = solve(pro)
-    println(res)
     @test length(res) == 1
 end
 
 
 @testset "solve-LinearProblem" begin
-    @variables x,y,z
+    @variables x, y, z
     eqs = [
         x + y + z ~ 3,
         x + 4y + 9z ~ 14,
         x + 2y + 3z ~ 6
     ]
     vars = Dict(x => 1.0, y => 0.0, z => 0.0)
-    pro = LinearProblem(eqs,vars)
+    pro = LinearProblem(eqs, vars)
     res = solve(pro)
-    @show res
-    @test round.(collect(values(res)), digits=1) == [1.0,1.0,1.0]
+    @test round.(collect(values(res)), digits=1) == [1.0, 1.0, 1.0]
 end
 
 
@@ -170,7 +167,6 @@ end
     vars = Dict(x => 2.0, y => 1.0)
     pro = NLProblem(eqs, vars)
     res = solve(pro)
-    @show res
     @test round(res[x], digits=2) == 1.04 &&
           round(res[y], digits=2) == 0.47
 end
@@ -235,8 +231,8 @@ end
             push!(eqs, sum([rand_num[j-i+2] * x[j] for j in i-1:i+1]) ~ s)
         end
     end
-    vars=Dict([x[i]=>0.0 for i in 1:N])
-    pro = LinearProblem(eqs,vars)
+    vars = Dict([x[i] => 0.0 for i in 1:N])
+    pro = LinearProblem(eqs, vars)
     res = solve(pro)
     @test round.(collect(values(res)), digits=1) == [1.0 for i in 1:N]
 end
@@ -257,8 +253,8 @@ end
             push!(eqs, sum([rand_num[j-i+2] * x[j] for j in i-1:i+1]) ~ s)
         end
     end
-    vars=Dict([x[i]=>0.0 for i in 1:N])
-    pro = NLProblem(eqs,vars)
+    vars = Dict([x[i] => 0.0 for i in 1:N])
+    pro = NLProblem(eqs, vars)
     res = solve(pro)
     @test round.(collect(values(res)), digits=1) == [1.0 for i in 1:N]
 end
