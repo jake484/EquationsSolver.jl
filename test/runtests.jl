@@ -218,7 +218,7 @@ end
 
 @testset "solve-LinearProblem" begin
     N = 20
-    @variables x[N]
+    @variables x[1:N]
     eqs = Vector{Equation}([])
     for i in 1:N
         rand_num = rand(1:20, Vector{Int}, 3)
@@ -240,7 +240,7 @@ end
 
 @testset "solve-LinearProblem by NLProblem" begin
     N = 100
-    @variables x[N]
+    @variables x[1:N]
     eqs = Vector{Equation}([])
     for i in 1:N
         rand_num = rand(1:20, Vector{Int}, 3)

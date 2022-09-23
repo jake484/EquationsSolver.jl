@@ -6,6 +6,7 @@ import Symbolics: @variables, Equation
 include("base.jl")
 
 abstract type EquationsProblem end
+
 struct LinearProblem <: EquationsProblem
     eqs::Vector{Equation}
     vars::Vector{Num}
