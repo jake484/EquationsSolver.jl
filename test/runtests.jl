@@ -1,6 +1,27 @@
 using EquationsSolver
 using Test
-using Symbolics
+
+@testset "promote_vars" begin
+    @variables x, y
+    vars = Dict(x=>1,y=>1)
+    @test EquationsSolver.promote_vars(vars) == Dict(x=>1.0,y=>1.0)
+end
+
+@testset "NLProblem Int" begin
+    @variables x, y, z
+    eqs = [
+        x^2 + y^2 + z^2 ~ 1.0
+        2 * x^2 + y^2 - 4 * z ~ 0
+        3 * x^2 - 4 * y^2 + z^2 ~ 0
+    ]
+    vars = Dict(x => 2, y => 1.0, z => 1)
+    pro = NLProblem(eqs, vars)
+    println(pro.vars)
+    res = solve(pro)
+    @test round(res[x], digits=2) == 0.70 &&
+          round(res[y], digits=2) == 0.63 &&
+          round(res[z], digits=2) == 0.34
+end
 
 @testset "check_eqs" begin
     @variables x, y
@@ -51,6 +72,7 @@ end
     res = LinearProblem(eqs, vars)
     @test typeof(res) == LinearProblem
 end
+
 
 
 @testset "solve" begin
@@ -196,6 +218,8 @@ end
           round(res[z], digits=2) == 0.34
 end
 
+
+
 @testset "solve-LinearProblem" begin
     N = 20
     @variables x[N]
@@ -216,7 +240,6 @@ end
     res = solve(pro)
     @test round.(collect(values(res)), digits=1) == [1.0 for i in 1:N]
 end
-
 
 
 @testset "solve-LinearProblem by NLProblem" begin

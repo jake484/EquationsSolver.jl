@@ -1,7 +1,7 @@
 module EquationsSolver
 
 using Symbolics
-import Symbolics:@variables,Equation
+import Symbolics: @variables, Equation
 
 include("base.jl")
 
@@ -24,15 +24,18 @@ function LinearProblem(eqs::Any, vars::Dict, maxiters=10000)
     res = check_vars(checked_eqs, vars)
     return LinearProblem(eqs, collect(keys(vars)), maxiters)
 end
-function NLProblem(eqs::Any, vars::Dict; maxiters=10000,abstol = 1.0E-6)
+
+function NLProblem(eqs::Any, vars::Dict; maxiters=10000, abstol=1.0E-6)
     eqs = check_eqs(eqs)
     res = check_vars(eqs, vars)
-    return NonlinearProblem(eqs, vars, maxiters,abstol)
+    vars = promote_vars(vars)
+    println(vars)
+    return NonlinearProblem(eqs, vars, maxiters, abstol)
 end
 
 export LinearProblem
 export NLProblem
 export solve
-export @variables,Equation
+export @variables, Equation
 include("solver.jl")
 end

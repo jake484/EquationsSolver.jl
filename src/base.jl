@@ -27,7 +27,7 @@ end
 function toexpr(eqs)
     expr = Vector{Num}([])
     for eq in eqs
-        push!(expr,eq.lhs - eq.rhs)
+        push!(expr, eq.lhs - eq.rhs)
     end
     return expr
 end
@@ -35,7 +35,7 @@ end
 function get_all_vars(eqs_expr)
     vars = Vector{Num}([])
     for expr in eqs_expr
-        vars = union(vars,get_vars(expr))
+        vars = union(vars, get_vars(expr))
     end
     return vars
 end
@@ -60,6 +60,10 @@ function check_vars(eqs, vars)
         error("$(rest_var) not in eqs")
     end
     return true
+end
+
+function promote_vars(vars::Dict)
+    return Dict(key => convert(Float64, value) for (key, value) in vars)
 end
 
 function islinear(eqs, vars)
