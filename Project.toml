@@ -1,7 +1,7 @@
 name = "EquationsSolver"
 uuid = "5d795e5a-a85f-4cbe-a274-66ed2c49fe0f"
 authors = ["yjy <522432938@qq.com> and contributors"]
-version = "0.2.0"
+version = "0.2.1"
 
 [deps]
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
