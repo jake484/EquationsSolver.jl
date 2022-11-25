@@ -10,7 +10,7 @@ function isin(var::Num, vars)
     return false
 end
 
-function get_Num(vars::Dict)
+function get_Num(vars::Dict{Num, Float64})
     return collect(keys(vars))
 end
 
