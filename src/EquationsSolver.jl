@@ -33,9 +33,12 @@ function NLProblem(eqs::Any, vars::Dict; maxiters=10000, abstol=1.0E-6)
     return NonlinearProblem(eqs, vars, maxiters, abstol)
 end
 
+include("linearSolver.jl")
+include("nonlinearSolver.jl")
+
 export LinearProblem
 export NLProblem
 export solve
 export @variables, Equation
-include("solver.jl")
+
 end

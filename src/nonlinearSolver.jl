@@ -1,12 +1,3 @@
-solve_liner = Symbolics.solve_for
-
-function solve(problem::LinearProblem)
-    eqs = problem.eqs
-    vars = problem.vars
-    sol = solve_liner(eqs, vars)
-    return Dict([(vars[i], sol[i]) for i in 1:length(vars)])
-end
-
 
 function one_cal(array, dict, f, ja)
     return array .- inv(Symbolics.value.(substitute.(ja, (dict,)))) * Symbolics.value.(substitute.(f, (dict,)))
