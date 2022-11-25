@@ -15,9 +15,10 @@ function get_Num(vars::Dict)
 end
 
 function check_eqs(eqs)
-    if typeof(eqs) == Equation
+    # if typeof(eqs) == Equation
+    if eqs isa  Equation
         return toexpr([eqs])
-    elseif typeof(eqs) == Vector{Equation}
+    elseif eqs isa Vector{Equation}
         return toexpr(eqs)
     else
         error("Error: type of eqs should not be $(typeof(eqs)).It must be Equation or Vector{Equation}")

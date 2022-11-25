@@ -1,6 +1,5 @@
 solve_liner = Symbolics.solve_for
 
-
 function solve(problem::LinearProblem)
     eqs = problem.eqs
     vars = problem.vars
