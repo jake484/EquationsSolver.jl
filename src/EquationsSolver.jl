@@ -1,19 +1,25 @@
 module EquationsSolver
 
 using Symbolics
+using LinearAlgebra, SparseArrays
 import Symbolics: @variables, Equation
 
-include("base.jl")
+include("base_preprocess.jl")
+include("base_linearequations.jl")
 
-abstract type EquationsProblem end
+abstract type AbstractSolveMethod end
+abstract type AbstractEquationsProblem end
 
-struct LinearProblem <: EquationsProblem
+struct DirectSolve <: AbstractSolveMethod end
+struct IterationSolve <: AbstractSolveMethod end
+
+struct LinearProblem <: AbstractEquationsProblem
     eqs::Vector{Equation}
     vars::Vector{Num}
     maxiters::Int
 end
 
-struct NonlinearProblem <: EquationsProblem
+struct NonlinearProblem <: AbstractEquationsProblem
     eqs::Vector{Num}
     vars::Dict
     maxiters::Int

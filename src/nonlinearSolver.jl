@@ -1,6 +1,9 @@
-
+#牛顿法
 function one_cal(array, dict, f, ja)
-    return array .- inv(Symbolics.value.(substitute.(ja, (dict,)))) * Symbolics.value.(substitute.(f, (dict,)))
+    ja=Symbolics.value.(substitute.(ja, (dict,)))
+    b=-Symbolics.value.(substitute.(f, (dict,)))
+    dx=ja\(-b)#线性方程
+    return array +dx 
 end
 
 
