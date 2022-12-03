@@ -1,9 +1,9 @@
 #牛顿法
 function one_cal(array, dict, f, ja)
-    ja=Symbolics.value.(substitute.(ja, (dict,)))
-    b=-Symbolics.value.(substitute.(f, (dict,)))
-    dx=ja\(-b)#线性方程
-    return array +dx 
+    ja = Symbolics.value.(substitute.(ja, (dict,)))
+    b = -Symbolics.value.(substitute.(f, (dict,)))
+    dx = ja \ (-b)#线性方程
+    return array + dx
 end
 
 
@@ -44,6 +44,6 @@ function solve(problem::NonlinearProblem)
     maxiters = problem.maxiters
     abstol = problem.abstol
     jac = Symbolics.jacobian(eqs, vars)
-    sol = _solve(dict_u, eqs, jac, maxiters, abstol,vars)
+    sol = _solve(dict_u, eqs, jac, maxiters, abstol, vars)
     return sol
 end

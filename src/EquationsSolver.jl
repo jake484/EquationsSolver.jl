@@ -11,7 +11,9 @@ abstract type AbstractSolveMethod end
 abstract type AbstractEquationsProblem end
 
 abstract type AbstractLinearMethod end
-struct Direct <: AbstractLinearMethod end
+struct Direct <: AbstractLinearMethod end               #Julia自带方法
+struct LUFactorized <: AbstractLinearMethod end         #已经进行LU分解的问题采用LU回带
+struct ConjugateGradient <: AbstractLinearMethod end    #共轭梯度法，CG为缩写
 struct CG <: AbstractLinearMethod end
 
 abstract type AbstractNLMethod end
@@ -21,7 +23,7 @@ struct LinearProblem <: AbstractEquationsProblem
     A::Matrix{Float64}
     b::Vector{Float64}
     maxiters::Int
-    LinearProblem(A,b,maxiters=10000)=new(A,b,maxiters)
+    LinearProblem(A, b, maxiters=10000) = new(A, b, maxiters)
 end
 
 struct NonlinearProblem <: AbstractEquationsProblem
@@ -34,7 +36,7 @@ end
 function LinearProblem(eqs::Any, vars::Dict, maxiters=10000)
     checked_eqs = check_eqs(eqs)
     res = check_vars(checked_eqs, vars)
-    dict=Dict(key=>0.0 for key in keys(vars))
+    dict = Dict(key => 0.0 for key in keys(vars))
     A::Matrix{Float64} = Symbolics.value.(Symbolics.jacobian(checked_eqs, collect(keys(vars))))
     b::Vector{Float64} = -Symbolics.value.(substitute.(checked_eqs, (dict,)))
     return LinearProblem(A, b, maxiters), keys(vars)
@@ -50,9 +52,18 @@ end
 include("linearSolver.jl")
 include("nonlinearSolver.jl")
 
-export LinearProblem
-export NLProblem
-export solve
-export @variables, Equation
+export
+    # Problem types
+    LinearProblem, NLProblem,
+    # Solve function
+    solve,
+    # Linear methods
+    Direct,
+    LUFactorized,
+    CG, ConjugateGradient,
+    # Nonlinear methods
+    Newton
 
+export @variables, Equation
+    
 end

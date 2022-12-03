@@ -16,7 +16,7 @@ end
 
 function check_eqs(eqs)
     # if typeof(eqs) == Equation
-    if eqs isa  Equation
+    if eqs isa Equation
         return toexpr([eqs])
     elseif eqs isa Vector{Equation}
         return toexpr(eqs)

@@ -45,7 +45,7 @@ LU_solve(L, U, p, b)
 
 返回x
 """
-function LU_solve(L::LowerTriangular, U, p, b)
+function LU_solve(L, U, p, b)
     b = b[p]
     n = size(L, 1)
     #y=inv(L)*b
@@ -58,6 +58,30 @@ function LU_solve(L::LowerTriangular, U, p, b)
     x[n] = y[n] / U[n, n]
     for i = n-1:-1:1
         x[i] = (y[i] - U[i, i+1:n]' * x[i+1:n]) / U[i, i]
+    end
+    return x
+end
+
+function LU_solve(F::LU, b::Vector)
+    b = b[F.p]
+    n = size(F.factors, 1)
+    #y=inv(L)*b
+    y::Vector{Float64} = zeros(n)
+    y[1] = b[1]
+    x = zeros(n)
+    for i = 2:n
+        y[i] = b[i]
+        for j = 1:i-1
+            y[i] -= F.factors[i, j] * y[j]
+        end
+    end
+    x[n] = y[n] / F.factors[n, n]
+    for i = n-1:-1:1
+        x[i] = y[i]
+        for j = i+1:n
+            x[i] -= F.factors[i, j] * x[j]
+        end
+        x[i] /= F.factors[i, i]
     end
     return x
 end
@@ -77,23 +101,23 @@ CG_solve(A, b; ep=1e-5)
 
 返回x
 """
-function CG_solve(A::Symmetric, b::Vector{Float64}; ep=1e-8)
+function CG_solve(A::Symmetric, b::Vector{Float64}; abserr=1e-8)
     n = size(A, 1)
     x = zeros(n)
     r = b
     d = r
     flag = 0
-    temp=sum(abs2.(r))
-    while (temp > ep) & (flag<n*4)
+    temp = sum(abs2.(r))
+    while (temp > abserr) & (flag < n * 4)
         alpha = temp / (d' * A * d)
         x = x + alpha * d
-        r=b-A*x
-        beta=sum(abs2.(r))/temp
-        temp=sum(abs2.(r))
-        d=r+beta*d
-        flag+=1
+        r = b - A * x
+        beta = sum(abs2.(r)) / temp
+        temp = sum(abs2.(r))
+        d = r + beta * d
+        flag += 1
     end
-    return x, flag
+    return x
 end
 ### end 共轭梯度法
 

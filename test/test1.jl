@@ -1,6 +1,8 @@
 using EquationsSolver
 using Test
 using Symbolics
+using LinearAlgebra
+
 @testset "LinearProblem" begin
     @variables x, y
     eqs = [
@@ -10,4 +12,22 @@ using Symbolics
     vars = Dict(x => 1.0, y => 1.0)
     res, varVector = LinearProblem(eqs, vars)
     @test typeof(res) == LinearProblem
+end
+
+
+@testset "linear solver" begin
+    A = rand(4, 4)
+    b = rand(4)
+    lp = LinearProblem(A, b)
+    x0 = A \ b
+    @test solve(lp) ≈ x0
+    @test solve(lp, Direct()) ≈ x0
+    F = lu(A)
+    @test solve(lp, LUFactorized(), F) ≈ x0
+    A = A + A' + 2 * I
+    b = 2 * b .+ 1
+    lp = LinearProblem(A, b)
+    x0 = A \ b
+    @test solve(lp, CG()) ≈ x0
+    @test solve(lp, ConjugateGradient(); abserr=1e-3) ≈ x0
 end
