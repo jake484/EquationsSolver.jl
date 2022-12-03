@@ -8,7 +8,7 @@ LU_factorization(A; sparsed=false)
 
 返回 L,U,p
 """
-function LU_factorization(A; sparsed=false)
+function LU_factorization(A::Matrix; sparsed=false)
     #下三角L，Doolittle分解
     L, U, p = lu(A)
     return sparsed ? (sparsed(L), sparsed(U), p) : (L, U, p)
@@ -21,12 +21,12 @@ LU_solve(A, b)
 
 返回x
 """
-function LU_solve(A, b)
+function LU_solve(A::Matrix, b::Vector)
     n = size(A, 1)
     _, U0, _ = LU_factorization(hcat(A, b))
     U = U0[:, 1:end-1]
     y = U0[:, end]
-    x = zeros(n)
+    x::Vector{Float64} = zeros(n)
     x[n] = y[n] / U[n, n]
     for i = n-1:-1:1
         x[i] = (y[i] - U[i, i+1:n]' * x[i+1:n]) / U[i, i]
@@ -45,7 +45,7 @@ LU_solve(L, U, p, b)
 
 返回x
 """
-function LU_solve(L, U, p, b)
+function LU_solve(L::LowerTriangular, U, p, b)
     b = b[p]
     n = size(L, 1)
     #y=inv(L)*b
@@ -73,9 +73,11 @@ CG_solve(A, b; ep=1e-5)
 
 对于良态矩阵或忽略摄入误差的情况下，一般迭代n次即可找到解
 
+对稀疏矩阵，迭代次数常常小于n
+
 返回x
 """
-function CG_solve(A, b; ep=1e-8)
+function CG_solve(A::Symmetric, b::Vector{Float64}; ep=1e-8)
     n = size(A, 1)
     x = zeros(n)
     r = b

@@ -10,13 +10,18 @@ include("base_linearequations.jl")
 abstract type AbstractSolveMethod end
 abstract type AbstractEquationsProblem end
 
-struct DirectSolve <: AbstractSolveMethod end
-struct IterationSolve <: AbstractSolveMethod end
+abstract type AbstractLinearMethod end
+struct Direct <: AbstractLinearMethod end
+struct CG <: AbstractLinearMethod end
+
+abstract type AbstractNLMethod end
+struct Newton <: AbstractNLMethod end
 
 struct LinearProblem <: AbstractEquationsProblem
-    eqs::Vector{Equation}
-    vars::Vector{Num}
+    A::Matrix{Float64}
+    b::Vector{Float64}
     maxiters::Int
+    LinearProblem(A,b,maxiters=10000)=new(A,b,maxiters)
 end
 
 struct NonlinearProblem <: AbstractEquationsProblem
@@ -29,7 +34,10 @@ end
 function LinearProblem(eqs::Any, vars::Dict, maxiters=10000)
     checked_eqs = check_eqs(eqs)
     res = check_vars(checked_eqs, vars)
-    return LinearProblem(eqs, collect(keys(vars)), maxiters)
+    dict=Dict(key=>0.0 for key in keys(vars))
+    A::Matrix{Float64} = Symbolics.value.(Symbolics.jacobian(checked_eqs, collect(keys(vars))))
+    b::Vector{Float64} = -Symbolics.value.(substitute.(checked_eqs, (dict,)))
+    return LinearProblem(A, b, maxiters), keys(vars)
 end
 
 function NLProblem(eqs::Any, vars::Dict; maxiters=10000, abstol=1.0E-6)
