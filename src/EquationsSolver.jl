@@ -1,44 +1,36 @@
 module EquationsSolver
 
 using Symbolics
+using LinearAlgebra, SparseArrays
 import Symbolics: @variables, Equation
 
-include("base.jl")
+abstract type AbstractSolveMethod end
+abstract type AbstractEquationsProblem end
 
-abstract type EquationsProblem end
+abstract type AbstractLinearMethod <: AbstractSolveMethod end
+abstract type AbstractNLMethod <: AbstractSolveMethod end
 
-struct LinearProblem <: EquationsProblem
-    eqs::Vector{Equation}
-    vars::Vector{Num}
-    maxiters::Int
-end
-
-struct NonlinearProblem <: EquationsProblem
-    eqs::Vector{Num}
-    vars::Dict
-    maxiters::Int
-    abstol::Float64
-end
-
-function LinearProblem(eqs::Any, vars::Dict, maxiters=10000)
-    checked_eqs = check_eqs(eqs)
-    res = check_vars(checked_eqs, vars)
-    return LinearProblem(eqs, collect(keys(vars)), maxiters)
-end
-
-function NLProblem(eqs::Any, vars::Dict; maxiters=10000, abstol=1.0E-6)
-    eqs = check_eqs(eqs)
-    res = check_vars(eqs, vars)
-    vars = promote_vars(vars)
-    return NonlinearProblem(eqs, vars, maxiters, abstol)
-end
+include("./bases/base_preprocess.jl")
+include("./bases/base_linearequations.jl")
+include("./bases/base_NLequations.jl")
 
 include("linearSolver.jl")
 include("nonlinearSolver.jl")
 
-export LinearProblem
-export NLProblem
-export solve
-export @variables, Equation
+export
+    # Problem types
+    LinearProblem, NonlinearProblem,
+    # Type function
+    NLProblem,
+    # Solve function
+    solve,
+    # Linear methods
+    Direct,
+    LUFactorized,
+    CG, ConjugateGradient,
+    # Nonlinear methods
+    Newton
 
+export @variables, Equation
+    
 end

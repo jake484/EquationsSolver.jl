@@ -10,13 +10,13 @@ function isin(var::Num, vars)
     return false
 end
 
-function get_Num(vars::Dict{Num, Float64})
+function get_Num(vars::Dict)
     return collect(keys(vars))
 end
 
 function check_eqs(eqs)
     # if typeof(eqs) == Equation
-    if eqs isa  Equation
+    if eqs isa Equation
         return toexpr([eqs])
     elseif eqs isa Vector{Equation}
         return toexpr(eqs)
