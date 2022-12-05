@@ -10,8 +10,8 @@ using LinearAlgebra
         x + y ~ 1
     ]
     vars = Dict(x => 1.0, y => 1.0)
-    res, varVector = LinearProblem(eqs, vars)
-    @test typeof(res) == LinearProblem
+    res = LinearProblem(eqs, vars)
+    @test typeof(res) == EquationsSolver.LinearProblem_functiontype
 end
 
 
@@ -29,5 +29,5 @@ end
     lp = LinearProblem(A, b)
     x0 = A \ b
     @test solve(lp, CG()) ≈ x0
-    @test solve(lp, ConjugateGradient(); abserr=1e-3) ≈ x0
+    @test solve(lp, ConjugateGradient(); abstol=1e-8) ≈ x0
 end

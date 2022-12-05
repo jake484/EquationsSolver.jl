@@ -1,4 +1,6 @@
+
 ###LU分解求线性方程组的根
+#=
 """
 LU_factorization(A; sparsed=false)
 
@@ -61,6 +63,7 @@ function LU_solve(L, U, p, b)
     end
     return x
 end
+=#
 
 function LU_solve(F::LU, b::Vector)
     b = b[F.p]
@@ -101,14 +104,14 @@ CG_solve(A, b; ep=1e-5)
 
 返回x
 """
-function CG_solve(A::Symmetric, b::Vector{Float64}; abserr=1e-8)
+function CG_solve(A::Symmetric, b::Vector{Float64}; abstol=1e-8)
     n = size(A, 1)
     x = zeros(n)
     r = b
     d = r
     flag = 0
     temp = sum(abs2.(r))
-    while (temp > abserr) & (flag < n * 4)
+    while (temp > abstol) & (flag < n * 4)
         alpha = temp / (d' * A * d)
         x = x + alpha * d
         r = b - A * x
@@ -120,8 +123,3 @@ function CG_solve(A::Symmetric, b::Vector{Float64}; abserr=1e-8)
     return x
 end
 ### end 共轭梯度法
-
-
-function linearSolve(A, b, method::Symbol=:LU)
-
-end

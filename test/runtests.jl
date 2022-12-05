@@ -69,7 +69,7 @@ end
     ]
     vars = Dict(x => 1.0, y => 1.0)
     res = LinearProblem(eqs, vars)
-    @test typeof(res) == LinearProblem
+    @test typeof(res) == EquationsSolver.LinearProblem_functiontype
 end
 
 
@@ -84,53 +84,6 @@ end
     res = EquationsSolver.solve(LinearProblem(eqs, vars))
     @test res == Dict(x => 1.0, y => 2.0)
 end
-
-
-
-@testset "one_cal" begin
-    @variables x
-    eqs = [
-        x + 5 - exp(x)
-    ]
-    vars = Dict(x => 2.0)
-    jac = Symbolics.jacobian(eqs, [x])
-    res = EquationsSolver.one_cal([1.0], vars, eqs, jac)
-    @test length(res) == 1
-end
-
-
-
-@testset "get_dict" begin
-    @variables x, y, z
-    value = [1.0, 2.0, 3.0]
-    vars = Dict(x => 2.0, y => 1.0, z => 3.0)
-    res = EquationsSolver.get_dict(value, vars, [x, y, z])
-    @test res == Dict(x => 1.0, y => 2.0, z => 3.0)
-end
-
-
-
-@testset "_solve" begin
-    @variables x, y, z
-    eqs = [
-        x + 5 - exp(x)
-    ]
-    vars = Dict(x => 2.0)
-    jac = Symbolics.jacobian(eqs, [x])
-    res = EquationsSolver._solve(vars, eqs, jac, 1000, 1.0E-6, [x])
-    @test length(res) == 1
-
-    eqs = [
-        x + y + z - 3,
-        x + 4y + 9z - 14,
-        x + 2y + 3z - 6
-    ]
-    vars = Dict(x => 1.0, y => 0.0, z => 0.0)
-    jac = Symbolics.jacobian(eqs, [x, y, z])
-    res = EquationsSolver._solve(vars, eqs, jac, 10000, 1.0E-6, [x, y, z])
-    @test round.(collect(values(res)), digits=1) == [1.0, 1.0, 1.0]
-end
-
 
 @testset "solve-NLProblem" begin
     @variables x
