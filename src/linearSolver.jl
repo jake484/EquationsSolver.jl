@@ -1,9 +1,15 @@
+"""
+LinearProblem type has 
+"""
 struct LinearProblem <: AbstractEquationsProblem
     A::Matrix{Float64}
     b::Vector{Float64}
-    maxiters::Int
-    LinearProblem(A, b, maxiters=10000) = new(A, b, maxiters)
+    guessValue::Vector{Float64}
+    maxiters::Int64
+    LinearProblem(A::Matrix{Float64}, b::Vector{Float64},guessValue::Vector{Float64}, maxiters::Int64=10000) = new(A, b,guessValue, maxiters)
 end
+
+LinearProblem(A::Matrix{Float64}, b::Vector{Float64}, maxiters::Int64=10000)=LinearProblem(A, b,zeros(length(b)), maxiters)
 
 struct LinearProblem_functiontype <: AbstractEquationsProblem
     lp::LinearProblem
@@ -11,6 +17,9 @@ struct LinearProblem_functiontype <: AbstractEquationsProblem
     LinearProblem_functiontype(lp::LinearProblem,vars::Vector{Num})=new(lp,vars)
 end
 
+"""
+Form a LinearProblem_functiontype with equations
+"""
 function LinearProblem(eqs::Any, vars::Dict, maxiters=10000)
     checked_eqs = check_eqs(eqs)
     res = check_vars(checked_eqs, vars)
@@ -26,9 +35,10 @@ struct LUFactorized <: AbstractLinearMethod end         #已经进行LU分解的
 struct ConjugateGradient <: AbstractLinearMethod end    #共轭梯度法，CG为缩写
 struct CG <: AbstractLinearMethod end
 
-#solve_liner = Symbolics.solve_for
 
-#采用Julia自带的求解方法
+"""
+Solve a LinearProblem with method '\\' originally in Julia
+"""
 function solve(problem::LinearProblem)
     problem.A \ problem.b
 end
@@ -38,13 +48,18 @@ function solve(lpf::LinearProblem_functiontype)
     Dict(zip(lpf.vars,solve(lpf.lp)))
 end
 
-#对于已经进行LU分解的问题采用LU分解的回带过程
+"""
+Solve a LinearProblem whose coefficient matrix has been LUP factorized
+"""
 function solve(problem::LinearProblem, ::LUFactorized, LUFactor::LU)
     LU_solve(LUFactor, problem.b)
 end
 
-#采用共轭梯度法，这里直接将矩阵A改为对称矩阵。如果A本来就对称，则没有影响
+"""
+Use Conjugate Gradient method to solve LinearProblem Ax=b where A is symmetric positive definit matrix.
+This method is very efficient, thus is recommended if A suit the case.
+"""
 function solve(problem::LinearProblem, ::CG; abstol=1e-8)
-    CG_solve(Symmetric(problem.A), problem.b; abstol=abstol)
+    CG_solve(Symmetric(problem.A), problem.b, problem.guessValue, abstol)
 end
 @deprecate solve(problem::LinearProblem, ::ConjugateGradient; abstol=1e-8) solve(problem, CG(); abstol=abstol)
