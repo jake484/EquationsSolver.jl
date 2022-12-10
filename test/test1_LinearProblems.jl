@@ -34,16 +34,24 @@ end
 
 @testset "GMRES method" begin
     n=100000
-    k=27.0
-    A=sprandn(n,n,k/n)+k*I
+    k=100.0
+    A=sprand(n,n,k/n)
+    dig=A*ones(n)
+    ia,ja,va=findnz(A)
+    for i=1:n
+        push!(ia,i)
+        push!(ja,i)
+        push!(va,dig[i])
+    end
+    A=sparse(ia,ja,va)
     b=rand(n)
     guessValue=zeros(n)
-    m=1
-    maxiters=10000
-    abstol=1e-8
+    m=10
+    maxiters=100
+    abstol=1e-6
 
     lp=LinearProblem(A,b,guessValue,maxiters)
 
-    x,err,iter=solve(lp,GMRESM(),10)
+    @time x,err,iter=solve(lp,GMRESM(),m)
     @test abs(err) < abstol
 end

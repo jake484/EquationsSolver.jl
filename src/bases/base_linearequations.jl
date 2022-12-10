@@ -54,9 +54,19 @@ function GMRES_restarted(A::AbstractMatrix{Float64}, b::Vector{Float64}, guessVa
     while error>abstol && iter < maxiter
         r=b-A*guessValue
         V,H=ArnoldiProcess(A,r,n,m)
+        
+        #=
+        这段的优化空间：
+        1. 对于Hessenberg矩阵直接用m次Givens变换，而不用自带的Householder分解
+        2. 矩阵H计算后不再使用，可以直接在H的内存计算R
+        3. 直接采用Julia自带的最小二乘问题求解替换QR分解求最小二乘问题是否更快
+        4. 即便做QR分解，矩阵Q也不用全部求出，只需求出第一行
+        5. 将H记录为m*m，最后一个元素单独记录是否能提高效率
+        =#
         Q,R=qr(H)
         c=Q[1,:]*norm(r)
         y=R\c[1:m]
+        
         guessValue += V[:,1:m]*y
         error=abs(c[m+1])
         iter+=1
