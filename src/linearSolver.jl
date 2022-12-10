@@ -2,11 +2,11 @@
 LinearProblem type has 
 """
 struct LinearProblem <: AbstractEquationsProblem
-    A::Matrix{Float64}
-    b::Vector{Float64}
+    A::AbstractMatrix{Float64}
+    b::AbstractVector{Float64}
     guessValue::Vector{Float64}
     maxiters::Int64
-    LinearProblem(A::Matrix{Float64}, b::Vector{Float64},guessValue::Vector{Float64}, maxiters::Int64=10000) = new(A, b,guessValue, maxiters)
+    LinearProblem(A::AbstractMatrix{Float64}, b::AbstractVector{Float64},guessValue::Vector{Float64}, maxiters::Int64=10000) = new(A, b,guessValue, maxiters)
 end
 
 LinearProblem(A::Matrix{Float64}, b::Vector{Float64}, maxiters::Int64=10000)=LinearProblem(A, b,zeros(length(b)), maxiters)
@@ -34,6 +34,7 @@ struct Direct <: AbstractLinearMethod end               #Julia自带方法
 struct LUFactorized <: AbstractLinearMethod end         #已经进行LU分解的问题采用LU回带
 struct ConjugateGradient <: AbstractLinearMethod end    #共轭梯度法，CG为缩写
 struct CG <: AbstractLinearMethod end
+struct GMRESM <: AbstractLinearMethod end
 
 
 """
@@ -63,3 +64,7 @@ function solve(problem::LinearProblem, ::CG; abstol=1e-8)
     CG_solve(Symmetric(problem.A), problem.b, problem.guessValue, abstol)
 end
 @deprecate solve(problem::LinearProblem, ::ConjugateGradient; abstol=1e-8) solve(problem, CG(); abstol=abstol)
+
+function  solve(problem::LinearProblem, ::GMRESM, m=10; abstol=1e-8)
+    GMRES_restarted(problem.A, problem.b, problem.guessValue,m , problem.maxiters, abstol)
+end

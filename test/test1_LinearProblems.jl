@@ -1,7 +1,7 @@
 using EquationsSolver
 using Test
 using Symbolics
-using LinearAlgebra
+using LinearAlgebra, SparseArrays
 
 @testset "LinearProblem" begin
     @variables x, y
@@ -30,4 +30,20 @@ end
     x0 = A \ b
     @test solve(lp, CG()) ≈ x0
     @test solve(lp, ConjugateGradient(); abstol=1e-8) ≈ x0
+end
+
+@testset "GMRES method" begin
+    n=100000
+    k=27.0
+    A=sprandn(n,n,k/n)+k*I
+    b=rand(n)
+    guessValue=zeros(n)
+    m=1
+    maxiters=10000
+    abstol=1e-8
+
+    lp=LinearProblem(A,b,guessValue,maxiters)
+
+    x,err,iter=solve(lp,GMRESM(),10)
+    @test abs(err) < abstol
 end

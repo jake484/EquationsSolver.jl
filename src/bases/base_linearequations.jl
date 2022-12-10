@@ -1,25 +1,8 @@
 
-function LU_solve(F::LU, b::Vector)
+function LU_solve(F::LU, b::Vector{Float64})
     b = b[F.p]
-    n = size(F.factors, 1)
-    #y=inv(L)*b
-    y::Vector{Float64} = zeros(n)
-    y[1] = b[1]
-    x = zeros(n)
-    for i = 2:n
-        y[i] = b[i]
-        for j = 1:i-1
-            y[i] -= F.factors[i, j] * y[j]
-        end
-    end
-    x[n] = y[n] / F.factors[n, n]
-    for i = n-1:-1:1
-        x[i] = y[i]
-        for j = i+1:n
-            x[i] -= F.factors[i, j] * x[j]
-        end
-        x[i] /= F.factors[i, i]
-    end
+    y = F.L \ b
+    x = F.U \ y
     return x
 end
 ### end LU
@@ -62,20 +45,30 @@ end
 """
 generalized minimum residual (GMRES) algorithm
 """
-function GMRES_restarted(A::Matrix{Float64}, b::Vector{Float64}, guessValue::Vector{Float64},m, abstol=1e-8)
+function GMRES_restarted(A::AbstractMatrix{Float64}, b::Vector{Float64}, guessValue::Vector{Float64},m , maxiter, abstol=1e-8)
     n = size(A, 1)
-    r=b-A*guessValue
-    beta=norm(r)
-    V,H=ArnoldiProcess(A,r,n,m)
-    
-    return x
+    error::Float64=Inf
+    iter::Int64=0
+    r=Vector{Float64}(undef,n)
+    c=Vector{Float64}(undef,m+1)
+    while error>abstol && iter < maxiter
+        r=b-A*guessValue
+        V,H=ArnoldiProcess(A,r,n,m)
+        Q,R=qr(H)
+        c=Q[1,:]*norm(r)
+        y=R\c[1:m]
+        guessValue += V[:,1:m]*y
+        error=abs(c[m+1])
+        iter+=1
+    end
+    return guessValue, error, iter
 end
 
 function HessenbergQR()
     
 end
 
-function ArnoldiProcess(A::Matrix{Float64},r::Vector{Float64},n::Int64,m::Int64)
+function ArnoldiProcess(A::AbstractMatrix{Float64},r::Vector{Float64},n::Int64,m::Int64)
     V=Array{Float64,2}(undef,n,m+1)
     V[:,1]=r/norm(r)
     H=UpperHessenberg(Array{Float64}(undef,m+1,m))

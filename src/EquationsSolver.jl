@@ -28,6 +28,7 @@ export
     Direct,
     LUFactorized,
     CG, ConjugateGradient,
+    GMRESM,
     # Nonlinear methods
     Newton
 
