@@ -1,23 +1,4 @@
 
-
-#=
-function get_dict(array, dict, vars)
-    for i in 1:length(vars)
-        dict[vars[i]] = array[i]
-    end
-    return dict
-end
-
-# 不再使用Symbolics.value.(substitute.(ja, (dict,)))
-function one_cal(array, dict, f, ja)
-    ja = Symbolics.value.(substitute.(ja, (dict,)))
-    b = -Symbolics.value.(substitute.(f, (dict,)))
-    dx = ja \ (b)#线性方程
-    return array + dx
-end
-=#
-
-
 # 牛顿法
 function NLNewton(f::Function, ja::Function, guessValue::Vector{Float64}, maxiter, abstol, lpMethod::AbstractLinearMethod=Direct(),lpiter::Int64=10000)
     this_ja(jaValue::Matrix{Float64}, x::Vector{Float64})=Base.invokelatest(ja,jaValue,x)
@@ -46,5 +27,17 @@ function NLNewton(f::Function, ja::Function, guessValue::Vector{Float64}, maxite
         error("Error: iterate times exceed maxiter")
     end
 
+    return newValue
+end
+
+function NLJacobianIter(f::Function, guessValue::Vector{Float64}, maxiter, abstol)
+    this_f(x::Vector{Float64})=Base.invokelatest(f,x)
+    temp=guessValue[:]
+    guessValue=this_f(guessValue)
+    iter=0
+    while maximum(abs.(temp-guessValue))>abstol && iter<maxiter
+        guessValue=f(guessValue)
+        iter+=1
+    end
     return newValue
 end

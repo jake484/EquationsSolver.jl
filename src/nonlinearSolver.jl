@@ -57,3 +57,8 @@ function solve(problem::NonlinearProblem_functiontype,method::AbstractNLMethod;l
     return Dict(zip(problem.vars,res))
 end
 solve(problem::NonlinearProblem_functiontype)=solve(problem,Newton())
+
+function solve(problem::NonlinearProblem, ::NLJacobianIter,)
+    
+end
+NLJacobianIter(f::Function, guessValue::Vector{Float64}, maxiter, abstol)

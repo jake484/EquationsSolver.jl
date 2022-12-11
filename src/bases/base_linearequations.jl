@@ -54,7 +54,6 @@ function GMRES_restarted(A::AbstractMatrix{Float64}, b::Vector{Float64}, guessVa
     while error>abstol && iter < maxiter
         r=b-A*guessValue
         V,H=ArnoldiProcess(A,r,n,m)
-        
         #=
         这段的优化空间：
         1. 对于Hessenberg矩阵直接用m次Givens变换，而不用自带的Householder分解
@@ -71,7 +70,7 @@ function GMRES_restarted(A::AbstractMatrix{Float64}, b::Vector{Float64}, guessVa
         error=abs(c[m+1])
         iter+=1
     end
-    return guessValue, error, iter
+    return guessValue, error
 end
 
 function HessenbergQR()
