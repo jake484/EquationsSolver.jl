@@ -50,8 +50,8 @@ end
     maxiters=100
     abstol=1e-6
 
-    lp=LinearProblem(A,b,guessValue,maxiters)
+    lp=LinearProblem(A,b,guessValue)
 
-    @time x,err,iter=solve(lp,GMRESM(),m)
+    @time x,err,iter=solve(lp,GMRESM(),m;maxiter=maxiters)
     @test abs(err) < abstol
 end

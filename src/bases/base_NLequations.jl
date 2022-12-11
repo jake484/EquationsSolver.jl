@@ -31,13 +31,14 @@ function NLNewton(f::Function, ja::Function, guessValue::Vector{Float64}, maxite
 end
 
 function NLJacobianIter(f::Function, guessValue::Vector{Float64}, maxiter, abstol)
-    this_f(x::Vector{Float64})=Base.invokelatest(f,x)
-    temp=guessValue[:]
-    guessValue=this_f(guessValue)
-    iter=0
-    while maximum(abs.(temp-guessValue))>abstol && iter<maxiter
-        guessValue=f(guessValue)
+    this_f(x::Vector{Float64})=Base.invokelatest(f,x)+x
+    iter::Int64=0
+    error::Float64=Inf
+    while error>abstol && iter<maxiter
+        temp=guessValue[:]
+        guessValue=this_f(guessValue)
+        error=maximum(abs.(temp-guessValue))
         iter+=1
     end
-    return newValue
+    return guessValue, error
 end

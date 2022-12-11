@@ -2,7 +2,7 @@ using EquationsSolver
 using Test
 using Symbolics
 
-@testset "NLProblem generate" begin
+@testset "NonlinearProblem generate" begin
     @variables x,y,z
 
     eqs=[
@@ -17,7 +17,7 @@ using Symbolics
         z=>3
     )
 
-    nlp=NLProblem(eqs,val)
+    nlp=NonlinearProblem(eqs,val)
     @test typeof(nlp)==EquationsSolver.NonlinearProblem_functiontype
 
     nlp.vars
@@ -41,4 +41,30 @@ using Symbolics
           x1[z]≈x0[z]
 
     @test solve(nlp)==x1
+end
+
+@testset "function input" begin
+    function myfun(x)
+        return [x[1]-cos(x[2]),x[2] - 2*cos(x[1])]
+    end
+    
+    guessValue=[0.0,0.0]
+    
+    NLP=NonlinearProblem(myfun,guessValue)
+    
+    x=solve(NLP,Newton(); maxiter=100, abstol=1e-8)
+    @test maximum(abs.(myfun(x))) < 1e-8
+end
+
+@testset "NLJacobian" begin
+    function myfun(x)
+        return [cos(x[2])-x[1],2*cos(x[1])-x[2]]
+    end
+    
+    guessValue=[0.0,0.0]
+    
+    NLP=NonlinearProblem(myfun,guessValue)
+    
+    x=solve(NLP,NLJacobian();maxiter=1000,abstol=1e-8)
+    @test maximum(abs.(myfun(x))) < 1e-8
 end

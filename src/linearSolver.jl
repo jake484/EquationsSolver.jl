@@ -67,7 +67,7 @@ end
 function  solve(problem::LinearProblem, ::GMRESM, m=10; maxiter=1000, abstol=1e-8)
     x, error=GMRES_restarted(problem.A, problem.b, problem.guessValue,m , maxiter, abstol)
     if error>abstol
-        @warn string("Unsuccessful solve, error = ",error)
+        @warn string("Unsuccessful solve, error = ",error,". Try larger m or larger iteration times.")
     end
-    return x        
+    return x
 end

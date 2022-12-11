@@ -30,7 +30,7 @@ export
     CG, ConjugateGradient,
     GMRESM,
     # Nonlinear methods
-    Newton
+    Newton,NLJacobian
 
 export @variables, Equation
     

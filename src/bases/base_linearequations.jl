@@ -70,7 +70,7 @@ function GMRES_restarted(A::AbstractMatrix{Float64}, b::Vector{Float64}, guessVa
         error=abs(c[m+1])
         iter+=1
     end
-    return guessValue, error
+    return guessValue, error, iter
 end
 
 function HessenbergQR()
