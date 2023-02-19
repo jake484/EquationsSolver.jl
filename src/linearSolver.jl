@@ -7,7 +7,6 @@ struct LinearProblem <: AbstractEquationsProblem
     guessValue::Vector{Float64}
     LinearProblem(A::AbstractMatrix{Float64}, b::AbstractVector{Float64},guessValue::Vector{Float64}) = new(A, b, guessValue)
 end
-
 LinearProblem(A::Matrix{Float64}, b::Vector{Float64})=LinearProblem(A, b,zeros(length(b)))
 
 struct LinearProblem_functiontype <: AbstractEquationsProblem
@@ -39,11 +38,10 @@ struct GMRESM <: AbstractLinearMethod end
 """
 Solve a LinearProblem with method '\\' originally in Julia
 """
-function solve(problem::LinearProblem)
+function solve(problem::LinearProblem, ::Direct)
     problem.A \ problem.b
 end
-solve(problem::LinearProblem, ::Direct) = solve(problem::LinearProblem)
-solve(problem::LinearProblem, ::Direct, lpiter::Int64) = solve(problem::LinearProblem)
+
 function solve(lpf::LinearProblem_functiontype)
     Dict(zip(lpf.vars,solve(lpf.lp)))
 end
@@ -51,7 +49,7 @@ end
 """
 Solve a LinearProblem whose coefficient matrix has been LUP factorized
 """
-function solve(problem::LinearProblem, ::LUFactorized, LUFactor::LU)
+function solve(problem::LinearProblem, ::LUFactorized; LUFactor::LU)
     LU_solve(LUFactor, problem.b)
 end
 
@@ -60,14 +58,26 @@ Use Conjugate Gradient method to solve LinearProblem Ax=b where A is symmetric p
 This method is very efficient, thus is recommended if A suit the case.
 """
 function solve(problem::LinearProblem, ::CG; abstol=1e-8)
-    CG_solve(Symmetric(problem.A), problem.b, problem.guessValue, abstol)
+    x,error=CG_solve(Symmetric(problem.A), problem.b, problem.guessValue, abstol)
+    if error>abstol
+        @warn string("Unsuccessful solve, error = ",error,".")
+    end
+    return x
 end
 @deprecate solve(problem::LinearProblem, ::ConjugateGradient; abstol=1e-8) solve(problem, CG(); abstol=abstol)
 
-function  solve(problem::LinearProblem, ::GMRESM, m=10; maxiter=1000, abstol=1e-8)
+function  solve(problem::LinearProblem, ::GMRESM; m=10, maxiter=1000, abstol=1e-8)
     x, error=GMRES_restarted(problem.A, problem.b, problem.guessValue,m , maxiter, abstol)
     if error>abstol
         @warn string("Unsuccessful solve, error = ",error,". Try larger m or larger iteration times.")
     end
     return x
+end
+
+# 求解设置封装
+function solve(problem::LinearProblem;lpSolverSetting::Dict{Symbol,T}=Dict(:method=>Direct())) where T<:Any
+    method::AbstractLinearMethod=lpSolverSetting[:method]
+    newdict::Dict{Symbol,Real}=delete!(lpSolverSetting,:method)
+    @warn "Better to use type solve(problem,method;lpSolverSetting...)"
+    solve(problem,method;newdict...)
 end
