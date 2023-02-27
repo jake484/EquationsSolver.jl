@@ -1,98 +1,15 @@
 
-###LU分解求线性方程组的根
-#=
-"""
-LU_factorization(A; sparsed=false)
-
-输入矩阵A，返回矩阵A的LUP分解L,U,p
-
-使得A[p,:]=L*U
-
-返回 L,U,p
-"""
-function LU_factorization(A::Matrix; sparsed=false)
-    #下三角L，Doolittle分解
-    L, U, p = lu(A)
-    return sparsed ? (sparsed(L), sparsed(U), p) : (L, U, p)
-end
-
-"""
-LU_solve(A, b)
-
-使用LU分解法求解方程Ax=b
-
-返回x
-"""
-function LU_solve(A::Matrix, b::Vector)
-    n = size(A, 1)
-    _, U0, _ = LU_factorization(hcat(A, b))
-    U = U0[:, 1:end-1]
-    y = U0[:, end]
-    x::Vector{Float64} = zeros(n)
-    x[n] = y[n] / U[n, n]
-    for i = n-1:-1:1
-        x[i] = (y[i] - U[i, i+1:n]' * x[i+1:n]) / U[i, i]
-    end
-    return x
-end
-
-"""
-LU_solve(L, U, p, b)
-
-使用LU分解法求解方程Ax=b
-
-如果已经将矩阵A完成LUP分解，即PA=LU或A[p,:]=L*U
-
-那么该方法可直接使用分解结果计算Ax=b的解
-
-返回x
-"""
-function LU_solve(L, U, p, b)
-    b = b[p]
-    n = size(L, 1)
-    #y=inv(L)*b
-    y = zeros(n)
-    y[1] = b[1]
-    x = zeros(n)
-    for i = 2:n
-        y[i] = b[i] - L[i, 1:i-1]' * y[1:i-1]
-    end
-    x[n] = y[n] / U[n, n]
-    for i = n-1:-1:1
-        x[i] = (y[i] - U[i, i+1:n]' * x[i+1:n]) / U[i, i]
-    end
-    return x
-end
-=#
-
-function LU_solve(F::LU, b::Vector)
+function LU_solve(F::LU, b::Vector{Float64})
     b = b[F.p]
-    n = size(F.factors, 1)
-    #y=inv(L)*b
-    y::Vector{Float64} = zeros(n)
-    y[1] = b[1]
-    x = zeros(n)
-    for i = 2:n
-        y[i] = b[i]
-        for j = 1:i-1
-            y[i] -= F.factors[i, j] * y[j]
-        end
-    end
-    x[n] = y[n] / F.factors[n, n]
-    for i = n-1:-1:1
-        x[i] = y[i]
-        for j = i+1:n
-            x[i] -= F.factors[i, j] * x[j]
-        end
-        x[i] /= F.factors[i, i]
-    end
+    y = F.L \ b
+    x = F.U \ y
     return x
 end
 ### end LU
 
 ### 共轭梯度法 Conjugate_Gradient
 """
-CG_solve(A, b; ep=1e-5)
+CG_solve(A::Symmetric{Float64}, b::Vector{Float64}, guessValue::Vector{Float64}, abstol=1e-8)
 
 当A为n×n对称正定矩阵时,可以采用共轭梯度法求解Ax=b的解
 
@@ -104,9 +21,9 @@ CG_solve(A, b; ep=1e-5)
 
 返回x
 """
-function CG_solve(A::Symmetric, b::Vector{Float64}; abstol=1e-8)
+function CG_solve(A::Symmetric{Float64}, b::Vector{Float64}, guessValue::Vector{Float64}, abstol::Float64=1e-8)
     n = size(A, 1)
-    x = zeros(n)
+    x = guessValue
     r = b
     d = r
     flag = 0
@@ -120,6 +37,72 @@ function CG_solve(A::Symmetric, b::Vector{Float64}; abstol=1e-8)
         d = r + beta * d
         flag += 1
     end
-    return x
+    return x, temp
 end
 ### end 共轭梯度法
+
+### GMRES
+"""
+generalized minimum residual (GMRES) algorithm
+"""
+function GMRES_restarted(A::AbstractMatrix{Float64}, b::Vector{Float64}, guessValue::Vector{Float64}, m::Int64, maxiter::Int64, abstol::Float64=1e-8)
+    n = size(A, 1)
+    error::Float64 = Inf
+    iter::Int64 = 0
+    r::Vector{Float64} = Vector{Float64}(undef, n)
+    c::Vector{Float64} = Vector{Float64}(undef, m + 1)
+    while error > abstol && iter < maxiter
+        r = b - A * guessValue
+        V, H = ArnoldiProcess(A, r, n, m)
+        #=
+        这段的优化空间：
+        1. 对于Hessenberg矩阵直接用m次Givens变换，而不用自带的Householder分解
+        2. 矩阵H计算后不再使用，可以直接在H的内存计算R
+        3. 直接采用Julia自带的最小二乘问题求解替换QR分解求最小二乘问题是否更快
+        4. 即便做QR分解，矩阵Q也不用全部求出，只需求出第一行
+        5. 将H记录为m*m，最后一个元素单独记录是否能提高效率
+        =#
+        Q, R = qr(H)
+        c = Q[1, :] * norm(r)
+        y = R \ c[1:m]
+
+        guessValue += V[:, 1:m] * y
+        error = abs(c[m+1])
+        iter += 1
+    end
+    return guessValue, error
+end
+
+function HessenbergQR()
+
+end
+
+function ArnoldiProcess(A::AbstractMatrix{Float64}, r::Vector{Float64}, n::Int64, m::Int64)
+    V = Array{Float64,2}(undef, n, m + 1)
+    V[:, 1] = r / norm(r)
+    H = UpperHessenberg(Array{Float64}(undef, m + 1, m))
+    v_next = Vector{Float64}(undef, n)
+    for k = 1:m-1
+        v_next = A * V[:, k]
+        for i = 1:k
+            H[i, k] = dot(v_next, V[:, i])
+        end
+        for i = 1:k
+            v_next -= H[i, k] * V[:, i]
+        end
+        H[k+1, k] = norm(v_next)
+        V[:, k+1] = v_next / H[k+1, k]
+    end
+    for i = 1:m
+        H[i, m] = dot(A * V[:, m], V[:, i])
+    end
+    v_next = A * V[:, m]
+    for i = 1:m
+        v_next -= H[i, m] * V[:, i]
+    end
+    H[m+1, m] = norm(v_next)
+    V[:, m+1] = (H[m+1, m] == 0) ? zeros(Float64, n) : v_next / H[m+1, m]
+    return V, H
+end
+
+### end GMRES
