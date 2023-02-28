@@ -12,6 +12,7 @@ Symbolics = "0c5d862f-8b57-4792-8d23-62f2024744c7"
 
 [compat]
 Documenter = "0.27"
+ForwardDiff = "0.10"
 Symbolics = "4"
 julia = "1"
 
